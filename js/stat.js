@@ -52,4 +52,4 @@ window.renderStatistics = function (ctx, names, times) {
     ctx.fillStyle = textColor;
     ctx.fillText(names[j], textX + (barWidth + barSpace) * j, 260);
   }
-}
+};
