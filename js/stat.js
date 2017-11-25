@@ -1,55 +1,88 @@
 'use strict';
 
 window.renderStatistics = function (ctx, names, times) {
-  var cloudX = 100;
-  var cloudY = 10;
-  var cloudWidth = 420;
-  var cloudHeight = 270;
-  var cloudColor = 'rgba(255, 255, 255, 1)';
-  var cloudShadowIndent = 10;
-  var cloudShadowColor = 'rgba(0, 0, 0, 0.7)';
-  var textColor = 'rgba(0, 0, 0, 1)';
-  var textFont = '16px PT Mono';
-  var textX = 120;
-  var textY = 40;
-  var textIndent = 20;
-  var barWidth = 40;
-  var barSpace = 50;
-  var barColorPlayer = 'rgba(255, 0, 0, 1)';
+  var text = {
+    COLOR: 'rgba(0, 0, 0, 1)',
+    FONT: '16px PT Mono',
+    X: 120,
+    Y: 40,
+    INDENT: 20
+  };
 
-  ctx.fillStyle = cloudShadowColor;
-  ctx.strokeRect(cloudX + cloudShadowIndent, cloudY + cloudShadowIndent, cloudWidth, cloudHeight);
-  ctx.fillRect(cloudX + cloudShadowIndent, cloudY + cloudShadowIndent, cloudWidth, cloudHeight);
-
-  ctx.fillStyle = cloudColor;
-  ctx.strokeRect(cloudX, cloudY, cloudWidth, cloudHeight);
-  ctx.fillRect(cloudX, cloudY, cloudWidth, cloudHeight);
-
-  ctx.fillStyle = textColor;
-  ctx.font = textFont;
-  ctx.fillText('Ура вы победили!', textX, textY);
-  ctx.fillText('Список результатов:', textX, textY + textIndent);
-
-  var max = -1;
-
-  for (var i = 0; i < times.length; i++) {
-    var time = times[i];
-    if (time > max) {
-      max = time;
+  var cloud = {
+    X: 100,
+    Y: 10,
+    WIDTH: 420,
+    HEIGHT: 270,
+    COLOR: 'rgba(255, 255, 255, 1)',
+    SHADOW: {
+      INDENT: 10,
+      COLOR: 'rgba(0, 0, 0, 0.7)'
     }
-  }
+  };
 
-  var graphHeight = 150;
-  var step = graphHeight / (max - 0);
+  var bar = {
+    WIDTH: 40,
+    SPACE: 50,
+    COLOR_PLAYER: 'rgba(255, 0, 0, 1)'
+  };
 
-  for (var j = 0; j < times.length; j++) {
-    if (names[j] === 'Вы') {
-      ctx.fillStyle = barColorPlayer;
-    } else {
-      ctx.fillStyle = 'rgba(0, 0, 255, ' + Math.random() + ')';
+  var drawCloud = function () {
+    var drawBodyCloud = function (color, x, y, width, height) {
+      ctx.fillStyle = color;
+      ctx.strokeRect(x, y, width, height);
+      ctx.fillRect(x, y, width, height);
+    };
+
+    var drawTextCloud = function (color, font, string, x, y) {
+      ctx.fillStyle = color;
+      ctx.font = font;
+      ctx.fillText(string, x, y);
+    };
+
+    drawBodyCloud(cloud.SHADOW.COLOR, cloud.X + cloud.SHADOW.INDENT, cloud.Y + cloud.SHADOW.INDENT, cloud.WIDTH, cloud.HEIGHT);
+    drawBodyCloud(cloud.COLOR, cloud.X, cloud.Y, cloud.WIDTH, cloud.HEIGHT);
+
+    drawTextCloud(text.COLOR, text.FONT, 'Ура вы победили!', text.X, text.Y);
+    drawTextCloud(text.COLOR, text.FONT, 'Список результатов:', text.X, text.Y + text.INDENT);
+  };
+
+  var drawGraph = function () {
+    var searchMaxValue = function () {
+      var max = -1;
+
+      for (var i = 0; i < times.length; i++) {
+        var time = times[i];
+        if (time > max) {
+          max = time;
+        }
+      }
+      return (max);
+    };
+
+    var selectionColor = function (name) {
+      if (name === 'Вы') {
+        ctx.fillStyle = bar.COLOR_PLAYER;
+      } else {
+        ctx.fillStyle = 'rgba(0, 0, 255, ' + Math.random() + ')';
+      }
+    };
+
+    var drawBar = function (time, name) {
+      ctx.fillRect(text.X + (bar.WIDTH + bar.SPACE) * j, 240 - time * step, bar.WIDTH, time * step);
+      ctx.fillStyle = text.COLOR;
+      ctx.fillText(name, text.X + (bar.WIDTH + bar.SPACE) * j, 260);
+    };
+
+    var graphHeight = 150;
+    var step = graphHeight / (searchMaxValue() - 0);
+
+    for (var j = 0; j < times.length; j++) {
+      selectionColor(names[j]);
+      drawBar(times[j], names[j]);
     }
-    ctx.fillRect(textX + (barWidth + barSpace) * j, 240 - times[j] * step, barWidth, times[j] * step);
-    ctx.fillStyle = textColor;
-    ctx.fillText(names[j], textX + (barWidth + barSpace) * j, 260);
-  }
+  };
+
+  drawCloud();
+  drawGraph();
 };
