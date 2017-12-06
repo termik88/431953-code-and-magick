@@ -45,5 +45,11 @@ var cloneWizard = function () {
   similarListElement.appendChild(fragment);
 };
 
-showSetup();
 cloneWizard();
+
+var buttonShowSetup = document.querySelector('.setup-open');
+buttonShowSetup.addEventListener('click', showSetup);
+
+var buttonCloseSetup = document.querySelector('.setup_close');
+/* buttonCloseSetup.removeEventListener('click', showSetup); */
+
