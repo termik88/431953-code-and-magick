@@ -3,6 +3,44 @@
 (function () {
   var NUMBER_WIZARD = 4;
 
+  /* Выбор случайного цвета */
+  window.colorizeElement = function (element, colors, currColor, nameFunction) {
+    var randomNonRepeatingColor = function (array, except) {
+      var currentColor = except;
+      var i = window.util.getRandomIndex(array);
+      while (array[i] === currentColor) {
+        i = window.util.getRandomIndex(array);
+      }
+      return array[i];
+    };
+
+    nameFunction(element, randomNonRepeatingColor(colors, currColor));
+  };
+
+  /* Конвертация в RGB в HEX */
+  var componentFromStr = function (numStr, percent) {
+    var num = Math.max(0, parseInt(numStr, 10));
+    return percent ?
+      Math.floor(255 * Math.min(100, num) / 100) : Math.min(255, num);
+  };
+
+  window.rgbToHex = function (rgb) {
+    var rgbRegex = /^rgb\(\s*(-?\d+)(%?)\s*,\s*(-?\d+)(%?)\s*,\s*(-?\d+)(%?)\s*\)$/;
+    var result;
+    var r;
+    var g;
+    var b;
+    var hex = '';
+    if ((result = rgbRegex.exec(rgb))) {
+      r = componentFromStr(result[1], result[2]);
+      g = componentFromStr(result[3], result[4]);
+      b = componentFromStr(result[5], result[6]);
+
+      hex = '#' + (0x1000000 + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+    return hex;
+  };
+
   var renderWizard = function (wizard) {
     var similarWizardTemplate = document.querySelector('#similar-wizard-template').content.querySelector('.setup-similar-item');
     var wizardElement = similarWizardTemplate.cloneNode(true);
