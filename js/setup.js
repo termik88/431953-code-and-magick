@@ -194,7 +194,7 @@
   var formSetup = setup.querySelector('.setup-wizard-form');
 
   formSetup.addEventListener('submit', function (evt) {
-    window.backend.save(new FormData(formSetup), function (response) {
+    window.backend.save(new FormData(formSetup), function () {
       setup.classList.add('hidden');
     }, errorHandler);
     evt.preventDefault();
