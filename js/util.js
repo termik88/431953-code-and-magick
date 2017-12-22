@@ -14,6 +14,9 @@
     ENTER: 13
   };
 
+  var DEBOUNCE_INTERVAL = 300;
+  var lastTimeout;
+
   window.util = {
     isEscEvent: function (evt, action) {
       if (evt.keyCode === KEY_CODE.ESC) {
@@ -27,6 +30,27 @@
     },
     getRandomIndex: function (array) {
       return Math.round(Math.random() * (array.length - 0.5));
+    },
+
+    /* Обработчик ошибок для работы с сервером*/
+    errorHandler: function (errorMessage) {
+      var node = document.createElement('div');
+      node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
+      node.style.position = 'absolute';
+      node.style.left = 0;
+      node.style.right = 0;
+      node.style.fontSize = '30px';
+
+      node.textContent = errorMessage;
+      document.body.insertAdjacentElement('afterbegin', node);
+    },
+
+    debounce: function (fun) {
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(fun, DEBOUNCE_INTERVAL);
     }
+
   };
 })();

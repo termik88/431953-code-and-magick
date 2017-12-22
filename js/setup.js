@@ -1,7 +1,6 @@
 'use strict';
 
 (function () {
-  var NUMBER_WIZARD = 4;
 
   var setup = document.querySelector('.setup');
 
@@ -150,53 +149,67 @@
     return hex;
   };
 
-  /* Функция полуения данных с сервера */
-  var similarListElement = setup.querySelector('.setup-similar-list');
-  var similarWizardTemplate = document.querySelector('#similar-wizard-template').content;
+  /* Функция скачивания и обработки json магов */
+  var coatColor;
+  var eyesColor;
+  var wizards = [];
 
-  var renderWizard = function (wizard) {
-    var wizardElement = similarWizardTemplate.cloneNode(true);
+  var getRank = function (wizard) {
+    var rank = 0;
 
-    wizardElement.querySelector('.setup-similar-label').textContent = wizard.name;
-    wizardElement.querySelector('.wizard-coat').style.fill = wizard.colorCoat;
-    wizardElement.querySelector('.wizard-eyes').style.fill = wizard.colorEyes;
-
-    return wizardElement;
-  };
-
-  var successHandler = function (wizards) {
-    var fragment = document.createDocumentFragment();
-
-    for (var i = 0; i < NUMBER_WIZARD; i++) {
-      fragment.appendChild(renderWizard(wizards[i]));
+    if (wizard.colorCoat === coatColor) {
+      rank += 2;
     }
-    similarListElement.appendChild(fragment);
+    if (wizard.colorEyes === eyesColor) {
+      rank += 1;
+    }
 
-    setup.querySelector('.setup-similar').classList.remove('hidden');
+    return rank;
   };
 
-  /* Обработчик ошибок для работы с сервером*/
-  var errorHandler = function (errorMessage) {
-    var node = document.createElement('div');
-    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
-    node.style.position = 'absolute';
-    node.style.left = 0;
-    node.style.right = 0;
-    node.style.fontSize = '30px';
-
-    node.textContent = errorMessage;
-    document.body.insertAdjacentElement('afterbegin', node);
+  var namesComparator = function (left, right) {
+    if (left > right) {
+      return 1;
+    } else if (left < right) {
+      return -1;
+    } else {
+      return 0;
+    }
   };
 
-  window.backend.load(successHandler, errorHandler);
+  var updateWizards = function () {
+    window.render(wizards.sort(function (left, right) {
+      var rankDiff = getRank(right) - getRank(left);
+      if (rankDiff === 0) {
+        rankDiff = namesComparator(left.name, right.name);
+      }
+      return rankDiff;
+    }));
+  };
+
+  window.wizard.onEyesChange = function (color) {
+    eyesColor = color;
+    window.util.debounce(updateWizards);
+  };
+
+  window.wizard.onCoatChange = function (color) {
+    coatColor = color;
+    window.util.debounce(updateWizards);
+  };
+
+  var successHandler = function (data) {
+    wizards = data;
+    updateWizards();
+  };
+
+  window.backend.load(successHandler, window.util.errorHandler);
 
   /* Функция отправки формы на сервер */
   var formSetup = setup.querySelector('.setup-wizard-form');
-
   formSetup.addEventListener('submit', function (evt) {
     window.backend.save(new FormData(formSetup), function () {
       setup.classList.add('hidden');
-    }, errorHandler);
+    }, window.util.errorHandler);
     evt.preventDefault();
   });
 

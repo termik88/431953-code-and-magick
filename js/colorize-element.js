@@ -1,5 +1,5 @@
 'use strict';
-
+/*
 (function () {
   var setup = document.querySelector('.setup');
   var setupWizard = setup.querySelector('.setup-wizard');
@@ -15,7 +15,7 @@
     element.style.backgroundColor = color;
   };
 
-  /* Редактирование персонажа */
+
   setupWizardEyes.addEventListener('click', function () {
     window.colorizeElement(setupWizardEyes, window.PARAMETERS_MAGES.EYES_COLORS, setupWizardEyes.style.fill, fillElement);
   });
@@ -29,3 +29,4 @@
   });
 
 })();
+*/
